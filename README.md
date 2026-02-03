@@ -67,7 +67,7 @@ migrate create -ext sql -dir db/migrations create_table_xxx
 ### Menjalankan Migrasi
 
 ```shell
-migrate -database "mysql://root:@tcp(localhost:3306)/go-finansia-multi-finance-technical-test?charset=utf8mb4&parseTime=True&loc=Local" up
+migrate -path db/migrations -database "mysql://root:@tcp(localhost:3301)/db_tech_test?charset=utf8mb4&parseTime=True&loc=Local" up
 ```
 
 ## Menjalankan Aplikasi
