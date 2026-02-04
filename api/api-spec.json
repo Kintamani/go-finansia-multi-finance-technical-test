@@ -5,10 +5,885 @@
     "description": "Golang Technical Test API Specification",
     "version": "1.0.0"
   },
-  "servers": [{
-    "url": "http://localhost:3000"
-  }],
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Contacts"
+    },
+    {
+      "name": "Addresses"
+    },
+    {
+      "name": "Contact Limits"
+    },
+    {
+      "name": "Transactions"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "AuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "schemas": {
+      "PageMetadata": {
+        "type": "object",
+        "properties": {
+          "page": { "type": "integer" },
+          "size": { "type": "integer" },
+          "total_item": { "type": "integer", "format": "int64" },
+          "total_page": { "type": "integer", "format": "int64" }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "username": { "type": "string" },
+          "name": { "type": "string" },
+          "token": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "UserTokenResponse": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" }
+        }
+      },
+      "ContactResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "nik": { "type": "string" },
+          "full_name": { "type": "string" },
+          "legal_name": { "type": "string" },
+          "birth_place": { "type": "string" },
+          "birth_date": { "type": "string" },
+          "salary": { "type": "integer", "format": "int64" },
+          "ktp_photo": { "type": "string" },
+          "selfie_photo": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "addresses": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AddressResponse" }
+          }
+        }
+      },
+      "AddressResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "street": { "type": "string" },
+          "city": { "type": "string" },
+          "province": { "type": "string" },
+          "postal_code": { "type": "string" },
+          "country": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ContactLimitResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "tenor": { "type": "integer" },
+          "limit_amount": { "type": "integer", "format": "int64" },
+          "used_amount": { "type": "integer", "format": "int64" },
+          "remaining_amount": { "type": "integer", "format": "int64" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "TransactionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "contract_number": { "type": "string" },
+          "tenor": { "type": "integer" },
+          "channel": { "type": "string" },
+          "otr": { "type": "integer", "format": "int64" },
+          "admin_fee": { "type": "integer", "format": "int64" },
+          "installment_amount": { "type": "integer", "format": "int64" },
+          "interest_amount": { "type": "integer", "format": "int64" },
+          "asset_name": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "RegisterUserRequest": {
+        "type": "object",
+        "required": ["username", "password", "name"],
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      },
+      "LoginUserRequest": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "password": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      },
+      "CreateContactRequest": {
+        "type": "object",
+        "required": ["nik", "full_name", "legal_name", "birth_place", "birth_date", "salary", "ktp_photo", "selfie_photo"],
+        "properties": {
+          "nik": { "type": "string" },
+          "full_name": { "type": "string" },
+          "legal_name": { "type": "string" },
+          "birth_place": { "type": "string" },
+          "birth_date": { "type": "string" },
+          "salary": { "type": "integer", "format": "int64" },
+          "ktp_photo": { "type": "string" },
+          "selfie_photo": { "type": "string" }
+        }
+      },
+      "UpdateContactRequest": {
+        "type": "object",
+        "required": ["nik", "full_name", "legal_name", "birth_place", "birth_date", "salary", "ktp_photo", "selfie_photo"],
+        "properties": {
+          "nik": { "type": "string" },
+          "full_name": { "type": "string" },
+          "legal_name": { "type": "string" },
+          "birth_place": { "type": "string" },
+          "birth_date": { "type": "string" },
+          "salary": { "type": "integer", "format": "int64" },
+          "ktp_photo": { "type": "string" },
+          "selfie_photo": { "type": "string" }
+        }
+      },
+      "CreateAddressRequest": {
+        "type": "object",
+        "properties": {
+          "street": { "type": "string" },
+          "city": { "type": "string" },
+          "province": { "type": "string" },
+          "postal_code": { "type": "string" },
+          "country": { "type": "string" }
+        }
+      },
+      "UpdateAddressRequest": {
+        "type": "object",
+        "properties": {
+          "street": { "type": "string" },
+          "city": { "type": "string" },
+          "province": { "type": "string" },
+          "postal_code": { "type": "string" },
+          "country": { "type": "string" }
+        }
+      },
+      "CreateContactLimitRequest": {
+        "type": "object",
+        "required": ["tenor", "limit_amount"],
+        "properties": {
+          "tenor": { "type": "integer", "enum": [1, 2, 3, 6] },
+          "limit_amount": { "type": "integer", "format": "int64" }
+        }
+      },
+      "UpdateContactLimitRequest": {
+        "type": "object",
+        "required": ["tenor", "limit_amount"],
+        "properties": {
+          "tenor": { "type": "integer", "enum": [1, 2, 3, 6] },
+          "limit_amount": { "type": "integer", "format": "int64" }
+        }
+      },
+      "CreateTransactionRequest": {
+        "type": "object",
+        "required": ["contract_number", "tenor", "channel", "otr", "admin_fee", "installment_amount", "interest_amount", "asset_name"],
+        "properties": {
+          "contract_number": { "type": "string" },
+          "tenor": { "type": "integer", "enum": [1, 2, 3, 6] },
+          "channel": { "type": "string" },
+          "otr": { "type": "integer", "format": "int64" },
+          "admin_fee": { "type": "integer", "format": "int64" },
+          "installment_amount": { "type": "integer", "format": "int64" },
+          "interest_amount": { "type": "integer", "format": "int64" },
+          "asset_name": { "type": "string" }
+        }
+      },
+      "UpdateTransactionRequest": {
+        "type": "object",
+        "required": ["contract_number", "tenor", "channel", "otr", "admin_fee", "installment_amount", "interest_amount", "asset_name"],
+        "properties": {
+          "contract_number": { "type": "string" },
+          "tenor": { "type": "integer", "enum": [1, 2, 3, 6] },
+          "channel": { "type": "string" },
+          "otr": { "type": "integer", "format": "int64" },
+          "admin_fee": { "type": "integer", "format": "int64" },
+          "installment_amount": { "type": "integer", "format": "int64" },
+          "interest_amount": { "type": "integer", "format": "int64" },
+          "asset_name": { "type": "string" }
+        }
+      },
+      "WebResponseUser": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/UserResponse" },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseUserToken": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/UserTokenResponse" },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseContact": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/ContactResponse" },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseContactList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ContactResponse" }
+          },
+          "paging": { "$ref": "#/components/schemas/PageMetadata" },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseAddress": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/AddressResponse" },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseAddressList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AddressResponse" }
+          },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseContactLimit": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/ContactLimitResponse" },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseContactLimitList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ContactLimitResponse" }
+          },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseTransaction": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/TransactionResponse" },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseTransactionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TransactionResponse" }
+          },
+          "errors": { "type": "string" }
+        }
+      },
+      "WebResponseBool": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "boolean" },
+          "errors": { "type": "string" }
+        }
+      }
+    }
+  },
   "paths": {
-
+    "/api/users": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Register user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseUser" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Logout user",
+        "security": [{ "AuthToken": [] }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseBool" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/_login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseUserToken" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/_current": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get current user",
+        "security": [{ "AuthToken": [] }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseUser" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Update current user",
+        "security": [{ "AuthToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseUser" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts": {
+      "get": {
+        "tags": ["Contacts"],
+        "summary": "List contacts",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "size", "in": "query", "schema": { "type": "integer" } },
+          { "name": "nik", "in": "query", "schema": { "type": "string" } },
+          { "name": "full_name", "in": "query", "schema": { "type": "string" } },
+          { "name": "legal_name", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContactList" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Contacts"],
+        "summary": "Create contact",
+        "security": [{ "AuthToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateContactRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContact" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}": {
+      "get": {
+        "tags": ["Contacts"],
+        "summary": "Get contact",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContact" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Contacts"],
+        "summary": "Update contact",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateContactRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContact" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Contacts"],
+        "summary": "Delete contact",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseBool" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}/addresses": {
+      "get": {
+        "tags": ["Addresses"],
+        "summary": "List addresses",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseAddressList" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Addresses"],
+        "summary": "Create address",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateAddressRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseAddress" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}/addresses/{addressId}": {
+      "get": {
+        "tags": ["Addresses"],
+        "summary": "Get address",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "addressId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseAddress" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Addresses"],
+        "summary": "Update address",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "addressId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAddressRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseAddress" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Addresses"],
+        "summary": "Delete address",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "addressId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseBool" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}/limits": {
+      "get": {
+        "tags": ["Contact Limits"],
+        "summary": "List contact limits",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContactLimitList" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Contact Limits"],
+        "summary": "Create contact limit",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateContactLimitRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContactLimit" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}/limits/{limitId}": {
+      "get": {
+        "tags": ["Contact Limits"],
+        "summary": "Get contact limit",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "limitId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContactLimit" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Contact Limits"],
+        "summary": "Update contact limit",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "limitId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateContactLimitRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseContactLimit" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Contact Limits"],
+        "summary": "Delete contact limit",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "limitId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseBool" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}/transactions": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "List transactions",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseTransactionList" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Transactions"],
+        "summary": "Create transaction",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTransactionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseTransaction" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}/transactions/{transactionId}": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transaction",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "transactionId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseTransaction" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Transactions"],
+        "summary": "Update transaction",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "transactionId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateTransactionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseTransaction" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Transactions"],
+        "summary": "Delete transaction",
+        "security": [{ "AuthToken": [] }],
+        "parameters": [
+          { "name": "contactId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "transactionId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebResponseBool" }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

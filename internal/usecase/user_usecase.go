@@ -6,6 +6,7 @@ import (
 	"go-finansia-multi-finance-technical-test/internal/model"
 	"go-finansia-multi-finance-technical-test/internal/model/converter"
 	"go-finansia-multi-finance-technical-test/internal/repository"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -15,12 +16,17 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	maxFailedLoginAttempts = 5
+	failedLoginWindow      = 15 * time.Minute
+	lockDuration           = 15 * time.Minute
+)
+
 type UserUseCase struct {
 	DB             *gorm.DB
 	Log            *logrus.Logger
 	Validate       *validator.Validate
 	UserRepository *repository.UserRepository
-	// UserProducer   *messaging.UserProducer
 }
 
 func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
@@ -67,7 +73,7 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.RegisterUserReq
 		return nil, fiber.ErrBadRequest
 	}
 
-	total, err := c.UserRepository.CountById(tx, request.ID)
+	total, err := c.UserRepository.CountByUsername(tx, request.Username)
 	if err != nil {
 		c.Log.Warnf("Failed count user from database : %+v", err)
 		return nil, fiber.ErrInternalServerError
@@ -85,7 +91,7 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.RegisterUserReq
 	}
 
 	user := &entity.User{
-		ID:       request.ID,
+		Username: request.Username,
 		Password: string(password),
 		Name:     request.Name,
 	}
@@ -113,17 +119,38 @@ func (c *UserUseCase) Login(ctx context.Context, request *model.LoginUserRequest
 	}
 
 	user := new(entity.User)
-	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
-		c.Log.Warnf("Failed find user by id : %+v", err)
+	if err := c.UserRepository.FindByUsername(tx, user, request.Username); err != nil {
+		c.Log.Warnf("Failed find user by username : %+v", err)
 		return nil, fiber.ErrUnauthorized
+	}
+
+	now := time.Now().UnixMilli()
+	if user.LockedUntil > now {
+		return nil, fiber.NewError(fiber.StatusTooManyRequests, "too many login attempts, try again later")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
 		c.Log.Warnf("Failed to compare user password with bcrype hash : %+v", err)
+		c.registerLoginFailure(user, now)
+		if err := c.UserRepository.Update(tx, user); err != nil {
+			c.Log.Warnf("Failed save user : %+v", err)
+			return nil, fiber.ErrInternalServerError
+		}
+		if err := tx.Commit().Error; err != nil {
+			c.Log.Warnf("Failed commit transaction : %+v", err)
+			return nil, fiber.ErrInternalServerError
+		}
+		if user.LockedUntil > now {
+			return nil, fiber.NewError(fiber.StatusTooManyRequests, "too many login attempts, try again later")
+		}
 		return nil, fiber.ErrUnauthorized
 	}
 
 	user.Token = uuid.New().String()
+	user.FailedLoginAttempts = 0
+	user.LastFailedLoginAt = 0
+	user.LockedUntil = 0
+	user.LastLoginAt = now
 	if err := c.UserRepository.Update(tx, user); err != nil {
 		c.Log.Warnf("Failed save user : %+v", err)
 		return nil, fiber.ErrInternalServerError
@@ -135,6 +162,19 @@ func (c *UserUseCase) Login(ctx context.Context, request *model.LoginUserRequest
 	}
 
 	return converter.UserToTokenResponse(user), nil
+}
+
+func (c *UserUseCase) registerLoginFailure(user *entity.User, now int64) {
+	if user.LastFailedLoginAt == 0 || now-user.LastFailedLoginAt > failedLoginWindow.Milliseconds() {
+		user.FailedLoginAttempts = 0
+	}
+
+	user.FailedLoginAttempts++
+	user.LastFailedLoginAt = now
+
+	if user.FailedLoginAttempts >= maxFailedLoginAttempts {
+		user.LockedUntil = now + lockDuration.Milliseconds()
+	}
 }
 
 func (c *UserUseCase) Current(ctx context.Context, request *model.GetUserRequest) (*model.UserResponse, error) {

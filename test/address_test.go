@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -49,8 +50,8 @@ func TestCreateAddress(t *testing.T) {
 	assert.Equal(t, requestBody.Province, responseBody.Data.Province)
 	assert.Equal(t, requestBody.Country, responseBody.Data.Country)
 	assert.Equal(t, requestBody.PostalCode, responseBody.Data.PostalCode)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	assert.NotEmpty(t, responseBody.Data.CreatedAt)
+	assert.NotEmpty(t, responseBody.Data.UpdatedAt)
 	assert.NotNil(t, responseBody.Data.ID)
 }
 
@@ -167,8 +168,8 @@ func TestGetAddress(t *testing.T) {
 	assert.Equal(t, address.Province, responseBody.Data.Province)
 	assert.Equal(t, address.Country, responseBody.Data.Country)
 	assert.Equal(t, address.PostalCode, responseBody.Data.PostalCode)
-	assert.Equal(t, address.CreatedAt, responseBody.Data.CreatedAt)
-	assert.Equal(t, address.UpdatedAt, responseBody.Data.UpdatedAt)
+	assert.Equal(t, address.CreatedAt.Format(time.RFC3339), responseBody.Data.CreatedAt)
+	assert.Equal(t, address.UpdatedAt.Format(time.RFC3339), responseBody.Data.UpdatedAt)
 }
 
 func TestGetAddressFailed(t *testing.T) {
@@ -232,8 +233,8 @@ func TestUpdateAddress(t *testing.T) {
 	assert.Equal(t, requestBody.Province, responseBody.Data.Province)
 	assert.Equal(t, requestBody.Country, responseBody.Data.Country)
 	assert.Equal(t, requestBody.PostalCode, responseBody.Data.PostalCode)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	assert.NotEmpty(t, responseBody.Data.CreatedAt)
+	assert.NotEmpty(t, responseBody.Data.UpdatedAt)
 	assert.NotNil(t, responseBody.Data.ID)
 }
 

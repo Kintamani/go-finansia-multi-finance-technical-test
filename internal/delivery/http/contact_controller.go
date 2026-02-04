@@ -45,12 +45,12 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
 	request := &model.SearchContactRequest{
-		UserId: auth.ID,
-		Name:   ctx.Query("name", ""),
-		Email:  ctx.Query("email", ""),
-		Phone:  ctx.Query("phone", ""),
-		Page:   ctx.QueryInt("page", 1),
-		Size:   ctx.QueryInt("size", 10),
+		UserId:    auth.ID,
+		NIK:       ctx.Query("nik", ""),
+		FullName:  ctx.Query("full_name", ""),
+		LegalName: ctx.Query("legal_name", ""),
+		Page:      ctx.QueryInt("page", 1),
+		Size:      ctx.QueryInt("size", 10),
 	}
 
 	responses, total, err := c.UseCase.Search(ctx.UserContext(), request)

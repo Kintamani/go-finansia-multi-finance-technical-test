@@ -41,12 +41,16 @@ func (c *ContactUseCase) Create(ctx context.Context, request *model.CreateContac
 	}
 
 	contact := &entity.Contact{
-		ID:        uuid.New().String(),
-		FirstName: request.FirstName,
-		LastName:  request.LastName,
-		Email:     request.Email,
-		Phone:     request.Phone,
-		UserId:    request.UserId,
+		ID:          uuid.New().String(),
+		NIK:         request.NIK,
+		FullName:    request.FullName,
+		LegalName:   request.LegalName,
+		BirthPlace:  request.BirthPlace,
+		BirthDate:   request.BirthDate,
+		Salary:      request.Salary,
+		KtpPhoto:    request.KtpPhoto,
+		SelfiePhoto: request.SelfiePhoto,
+		UserId:      request.UserId,
 	}
 
 	if err := c.ContactRepository.Create(tx, contact); err != nil {
@@ -77,10 +81,14 @@ func (c *ContactUseCase) Update(ctx context.Context, request *model.UpdateContac
 		return nil, fiber.ErrBadRequest
 	}
 
-	contact.FirstName = request.FirstName
-	contact.LastName = request.LastName
-	contact.Email = request.Email
-	contact.Phone = request.Phone
+	contact.NIK = request.NIK
+	contact.FullName = request.FullName
+	contact.LegalName = request.LegalName
+	contact.BirthPlace = request.BirthPlace
+	contact.BirthDate = request.BirthDate
+	contact.Salary = request.Salary
+	contact.KtpPhoto = request.KtpPhoto
+	contact.SelfiePhoto = request.SelfiePhoto
 
 	if err := c.ContactRepository.Update(tx, contact); err != nil {
 		c.Log.WithError(err).Error("error updating contact")

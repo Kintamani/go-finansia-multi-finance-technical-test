@@ -12,8 +12,8 @@
   "database": {
     "username": "root",
     "password": "",
-    "host": "localhost",
-    "port": 3301,
+    "host": "mysql",
+    "port": 3306,
     "name": "db_tech_test",
     "pool": {
       "idle": 10,
@@ -22,7 +22,7 @@
     }
   },
   "redis": {
-    "host": "localhost",
+    "host": "redis",
     "port": 6379,
     "password": "",
     "db": 0

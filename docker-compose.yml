@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: app_tech_test
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config.docker.json:/app/config.json:ro
+    networks:
+      - app_net
+
+  mysql:
+    image: mysql:8.4
+    container_name: mysql_tech_test
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: db_tech_test
+    ports:
+      - "3301:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - app_net
+
+  redis:
+    image: redis:7.2
+    container_name: redis_tech_test
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    name: app_tech_test
+
+volumes:
+  mysql_data:
+  redis_data:

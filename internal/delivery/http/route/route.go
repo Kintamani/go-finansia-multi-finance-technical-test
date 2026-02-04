@@ -7,11 +7,13 @@ import (
 )
 
 type RouteConfig struct {
-	App               *fiber.App
-	UserController    *http.UserController
-	ContactController *http.ContactController
-	AddressController *http.AddressController
-	AuthMiddleware    fiber.Handler
+	App                    *fiber.App
+	UserController         *http.UserController
+	ContactController      *http.ContactController
+	AddressController      *http.AddressController
+	ContactLimitController *http.ContactLimitController
+	TransactionController  *http.TransactionController
+	AuthMiddleware         fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -20,25 +22,38 @@ func (c *RouteConfig) Setup() {
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
-	c.App.Post("/api/users", c.UserController.Register)
-	c.App.Post("/api/users/_login", c.UserController.Login)
+	guest := c.App.Group("/api")
+	guest.Post("/users", c.UserController.Register)
+	guest.Post("/users/_login", c.UserController.Login)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
-	c.App.Use(c.AuthMiddleware)
-	c.App.Delete("/api/users", c.UserController.Logout)
-	c.App.Patch("/api/users/_current", c.UserController.Update)
-	c.App.Get("/api/users/_current", c.UserController.Current)
+	auth := c.App.Group("/api", c.AuthMiddleware)
+	auth.Delete("/users", c.UserController.Logout)
+	auth.Patch("/users/_current", c.UserController.Update)
+	auth.Get("/users/_current", c.UserController.Current)
 
-	c.App.Get("/api/contacts", c.ContactController.List)
-	c.App.Post("/api/contacts", c.ContactController.Create)
-	c.App.Put("/api/contacts/:contactId", c.ContactController.Update)
-	c.App.Get("/api/contacts/:contactId", c.ContactController.Get)
-	c.App.Delete("/api/contacts/:contactId", c.ContactController.Delete)
+	auth.Get("/contacts", c.ContactController.List)
+	auth.Post("/contacts", c.ContactController.Create)
+	auth.Put("/contacts/:contactId", c.ContactController.Update)
+	auth.Get("/contacts/:contactId", c.ContactController.Get)
+	auth.Delete("/contacts/:contactId", c.ContactController.Delete)
 
-	c.App.Get("/api/contacts/:contactId/addresses", c.AddressController.List)
-	c.App.Post("/api/contacts/:contactId/addresses", c.AddressController.Create)
-	c.App.Put("/api/contacts/:contactId/addresses/:addressId", c.AddressController.Update)
-	c.App.Get("/api/contacts/:contactId/addresses/:addressId", c.AddressController.Get)
-	c.App.Delete("/api/contacts/:contactId/addresses/:addressId", c.AddressController.Delete)
+	auth.Get("/contacts/:contactId/addresses", c.AddressController.List)
+	auth.Post("/contacts/:contactId/addresses", c.AddressController.Create)
+	auth.Put("/contacts/:contactId/addresses/:addressId", c.AddressController.Update)
+	auth.Get("/contacts/:contactId/addresses/:addressId", c.AddressController.Get)
+	auth.Delete("/contacts/:contactId/addresses/:addressId", c.AddressController.Delete)
+
+	auth.Get("/contacts/:contactId/limits", c.ContactLimitController.List)
+	auth.Post("/contacts/:contactId/limits", c.ContactLimitController.Create)
+	auth.Put("/contacts/:contactId/limits/:limitId", c.ContactLimitController.Update)
+	auth.Get("/contacts/:contactId/limits/:limitId", c.ContactLimitController.Get)
+	auth.Delete("/contacts/:contactId/limits/:limitId", c.ContactLimitController.Delete)
+
+	auth.Get("/contacts/:contactId/transactions", c.TransactionController.List)
+	auth.Post("/contacts/:contactId/transactions", c.TransactionController.Create)
+	auth.Put("/contacts/:contactId/transactions/:transactionId", c.TransactionController.Update)
+	auth.Get("/contacts/:contactId/transactions/:transactionId", c.TransactionController.Get)
+	auth.Delete("/contacts/:contactId/transactions/:transactionId", c.TransactionController.Delete)
 }

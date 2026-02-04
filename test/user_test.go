@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
@@ -17,9 +18,9 @@ import (
 func TestRegister(t *testing.T) {
 	ClearAll()
 	requestBody := model.RegisterUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "rahasia",
-		Name:     "Eko Khannedy",
+		Name:     "Nono Cahyono",
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
@@ -40,16 +41,16 @@ func TestRegister(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, response.StatusCode)
-	assert.Equal(t, requestBody.ID, responseBody.Data.ID)
+	assert.Equal(t, requestBody.Username, responseBody.Data.Username)
 	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	assert.NotEmpty(t, responseBody.Data.CreatedAt)
+	assert.NotEmpty(t, responseBody.Data.UpdatedAt)
 }
 
 func TestRegisterError(t *testing.T) {
 	ClearAll()
 	requestBody := model.RegisterUserRequest{
-		ID:       "",
+		Username: "",
 		Password: "",
 		Name:     "",
 	}
@@ -80,9 +81,9 @@ func TestRegisterDuplicate(t *testing.T) {
 	TestRegister(t) // register success
 
 	requestBody := model.RegisterUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "rahasia",
-		Name:     "Eko Khannedy",
+		Name:     "Nono Cahyono",
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
@@ -110,7 +111,7 @@ func TestLogin(t *testing.T) {
 	TestRegister(t) // register success
 
 	requestBody := model.LoginUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "rahasia",
 	}
 
@@ -135,7 +136,7 @@ func TestLogin(t *testing.T) {
 	assert.NotNil(t, responseBody.Data.Token)
 
 	user := new(entity.User)
-	err = db.Where("id = ?", requestBody.ID).First(user).Error
+	err = db.Where("username = ?", requestBody.Username).First(user).Error
 	assert.Nil(t, err)
 	assert.Equal(t, user.Token, responseBody.Data.Token)
 }
@@ -145,7 +146,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	TestRegister(t) // register success
 
 	requestBody := model.LoginUserRequest{
-		ID:       "wrong",
+		Username: "wrong",
 		Password: "rahasia",
 	}
 
@@ -175,7 +176,7 @@ func TestLoginWrongPassword(t *testing.T) {
 	TestRegister(t) // register success
 
 	requestBody := model.LoginUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "wrong",
 	}
 
@@ -205,7 +206,7 @@ func TestLogout(t *testing.T) {
 	TestLogin(t) // login success
 
 	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	request := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
@@ -255,7 +256,7 @@ func TestGetCurrentUser(t *testing.T) {
 	TestLogin(t) // login success
 
 	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	request := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
@@ -274,10 +275,10 @@ func TestGetCurrentUser(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, response.StatusCode)
-	assert.Equal(t, user.ID, responseBody.Data.ID)
+	assert.Equal(t, user.Username, responseBody.Data.Username)
 	assert.Equal(t, user.Name, responseBody.Data.Name)
-	assert.Equal(t, user.CreatedAt, responseBody.Data.CreatedAt)
-	assert.Equal(t, user.UpdatedAt, responseBody.Data.UpdatedAt)
+	assert.Equal(t, user.CreatedAt.Format(time.RFC3339), responseBody.Data.CreatedAt)
+	assert.Equal(t, user.UpdatedAt.Format(time.RFC3339), responseBody.Data.UpdatedAt)
 }
 
 func TestGetCurrentUserFailed(t *testing.T) {
@@ -308,11 +309,11 @@ func TestUpdateUserName(t *testing.T) {
 	TestLogin(t) // login success
 
 	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	requestBody := model.UpdateUserRequest{
-		Name: "Eko Kurniawan Khannedy",
+		Name: "Nono Cahyono",
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
@@ -334,10 +335,10 @@ func TestUpdateUserName(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, response.StatusCode)
-	assert.Equal(t, user.ID, responseBody.Data.ID)
+	assert.Equal(t, user.Username, responseBody.Data.Username)
 	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	assert.NotEmpty(t, responseBody.Data.CreatedAt)
+	assert.NotEmpty(t, responseBody.Data.UpdatedAt)
 }
 
 func TestUpdateUserPassword(t *testing.T) {
@@ -345,7 +346,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	TestLogin(t) // login success
 
 	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	requestBody := model.UpdateUserRequest{
@@ -371,12 +372,12 @@ func TestUpdateUserPassword(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, response.StatusCode)
-	assert.Equal(t, user.ID, responseBody.Data.ID)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	assert.Equal(t, user.Username, responseBody.Data.Username)
+	assert.NotEmpty(t, responseBody.Data.CreatedAt)
+	assert.NotEmpty(t, responseBody.Data.UpdatedAt)
 
 	user = new(entity.User)
-	err = db.Where("id = ?", "khannedy").First(user).Error
+	err = db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))

@@ -19,7 +19,7 @@ func NewContactRepository(log *logrus.Logger) *ContactRepository {
 	}
 }
 
-func (r *ContactRepository) FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error {
+func (r *ContactRepository) FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId int64) error {
 	return db.Where("id = ? AND user_id = ?", id, userId).Take(contact).Error
 }
 
@@ -41,19 +41,18 @@ func (r *ContactRepository) FilterContact(request *model.SearchContactRequest) f
 	return func(tx *gorm.DB) *gorm.DB {
 		tx = tx.Where("user_id = ?", request.UserId)
 
-		if name := request.Name; name != "" {
-			name = "%" + name + "%"
-			tx = tx.Where("first_name LIKE ? OR last_name LIKE ?", name, name)
+		if nik := request.NIK; nik != "" {
+			tx = tx.Where("nik = ?", nik)
 		}
 
-		if phone := request.Phone; phone != "" {
-			phone = "%" + phone + "%"
-			tx = tx.Where("phone LIKE ?", phone)
+		if fullName := request.FullName; fullName != "" {
+			fullName = "%" + fullName + "%"
+			tx = tx.Where("full_name LIKE ?", fullName)
 		}
 
-		if email := request.Email; email != "" {
-			email = "%" + email + "%"
-			tx = tx.Where("email LIKE ?", email)
+		if legalName := request.LegalName; legalName != "" {
+			legalName = "%" + legalName + "%"
+			tx = tx.Where("legal_name LIKE ?", legalName)
 		}
 
 		return tx

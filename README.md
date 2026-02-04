@@ -53,6 +53,10 @@ Semua konfigurasi ada di file `config.json`.
 ## API Spec
 
 Seluruh API Spec ada di folder `api`.
+Penanganan OWASP :
+• Rate limit
+• Handle sql injection
+• CORS
 
 ## Migrasi Database
 

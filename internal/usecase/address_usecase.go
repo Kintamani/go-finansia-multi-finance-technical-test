@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"go-finansia-multi-finance-technical-test/internal/entity"
-	"go-finansia-multi-finance-technical-test/internal/gateway/messaging"
 	"go-finansia-multi-finance-technical-test/internal/model"
 	"go-finansia-multi-finance-technical-test/internal/model/converter"
 	"go-finansia-multi-finance-technical-test/internal/repository"
@@ -21,7 +20,6 @@ type AddressUseCase struct {
 	Validate          *validator.Validate
 	AddressRepository *repository.AddressRepository
 	ContactRepository *repository.ContactRepository
-	AddressProducer   *messaging.AddressProducer
 }
 
 func NewAddressUseCase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
@@ -71,17 +69,6 @@ func (c *AddressUseCase) Create(ctx context.Context, request *model.CreateAddres
 		return nil, fiber.ErrInternalServerError
 	}
 
-	if c.AddressProducer != nil {
-		event := converter.AddressToEvent(address)
-		if err := c.AddressProducer.Send(event); err != nil {
-			c.Log.WithError(err).Error("failed to publish address created event")
-			return nil, fiber.ErrInternalServerError
-		}
-		c.Log.Info("Published address created event")
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping address created event")
-	}
-
 	return converter.AddressToResponse(address), nil
 }
 
@@ -120,17 +107,6 @@ func (c *AddressUseCase) Update(ctx context.Context, request *model.UpdateAddres
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("failed to commit transaction")
 		return nil, fiber.ErrInternalServerError
-	}
-
-	if c.AddressProducer != nil {
-		event := converter.AddressToEvent(address)
-		if err := c.AddressProducer.Send(event); err != nil {
-			c.Log.WithError(err).Error("failed to publish address updated event")
-			return nil, fiber.ErrInternalServerError
-		}
-		c.Log.Info("Published address updated event")
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping address updated event")
 	}
 
 	return converter.AddressToResponse(address), nil

@@ -1,0 +1,344 @@
+{
+  "info": {
+    "name": "Golang Clean Architecture API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "contactId", "value": "" },
+    { "key": "addressId", "value": "" },
+    { "key": "limitId", "value": "" },
+    { "key": "transactionId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"joko\",\n  \"password\": \"joko\",\n  \"name\": \"Joko\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"joko\",\n  \"password\": \"joko\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/_login"
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/users/_current"
+          }
+        },
+        {
+          "name": "Update Current User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Joko Updated\",\n  \"password\": \"rahasia\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/_current"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "item": [
+        {
+          "name": "List Contacts",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts?page=1&size=10&nik=&full_name=&legal_name="
+          }
+        },
+        {
+          "name": "Create Contact",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nik\": \"3200000000000001\",\n  \"full_name\": \"Joko\",\n  \"legal_name\": \"Joko\",\n  \"birth_place\": \"Jakarta\",\n  \"birth_date\": \"1990-01-01\",\n  \"salary\": 7500000,\n  \"ktp_photo\": \"https://example.com/ktp.jpg\",\n  \"selfie_photo\": \"https://example.com/selfie.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts"
+          }
+        },
+        {
+          "name": "Get Contact",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}"
+          }
+        },
+        {
+          "name": "Update Contact",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nik\": \"3200000000000002\",\n  \"full_name\": \"Joko Updated\",\n  \"legal_name\": \"Joko Updated\",\n  \"birth_place\": \"Bandung\",\n  \"birth_date\": \"1991-02-02\",\n  \"salary\": 8000000,\n  \"ktp_photo\": \"https://example.com/ktp2.jpg\",\n  \"selfie_photo\": \"https://example.com/selfie2.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}"
+          }
+        },
+        {
+          "name": "Delete Contact",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Addresses",
+      "item": [
+        {
+          "name": "List Addresses",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/addresses"
+          }
+        },
+        {
+          "name": "Create Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"street\": \"Jl. Jalan\",\n  \"city\": \"Jakarta\",\n  \"province\": \"DKI Jakarta\",\n  \"country\": \"Indonesia\",\n  \"postal_code\": \"12345\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/addresses"
+          }
+        },
+        {
+          "name": "Get Address",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}"
+          }
+        },
+        {
+          "name": "Update Address",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"street\": \"Jl. Sudah Jadi\",\n  \"city\": \"Jakarta\",\n  \"province\": \"DKI Jakarta\",\n  \"country\": \"Indonesia\",\n  \"postal_code\": \"12345\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}"
+          }
+        },
+        {
+          "name": "Delete Address",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contact Limits",
+      "item": [
+        {
+          "name": "List Contact Limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/limits"
+          }
+        },
+        {
+          "name": "Create Contact Limit",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenor\": 1,\n  \"limit_amount\": 100000\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/limits"
+          }
+        },
+        {
+          "name": "Get Contact Limit",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/limits/{{limitId}}"
+          }
+        },
+        {
+          "name": "Update Contact Limit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenor\": 2,\n  \"limit_amount\": 200000\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/limits/{{limitId}}"
+          }
+        },
+        {
+          "name": "Delete Contact Limit",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/limits/{{limitId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "List Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/transactions"
+          }
+        },
+        {
+          "name": "Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contract_number\": \"CN-1001\",\n  \"tenor\": 1,\n  \"channel\": \"ecommerce\",\n  \"otr\": 100000,\n  \"admin_fee\": 5000,\n  \"installment_amount\": 25000,\n  \"interest_amount\": 2000,\n  \"asset_name\": \"Motor\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/transactions"
+          }
+        },
+        {
+          "name": "Get Transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/transactions/{{transactionId}}"
+          }
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contract_number\": \"CN-1001-UPDATED\",\n  \"tenor\": 1,\n  \"channel\": \"dealer\",\n  \"otr\": 120000,\n  \"admin_fee\": 6000,\n  \"installment_amount\": 30000,\n  \"interest_amount\": 2500,\n  \"asset_name\": \"Motor\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/transactions/{{transactionId}}"
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "{{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/contacts/{{contactId}}/transactions/{{transactionId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

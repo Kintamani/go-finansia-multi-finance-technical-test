@@ -1,14 +1,18 @@
 package model
 
 type ContactEvent struct {
-	ID        string `json:"id"`
-	UserID    string `json:"user_id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
-	CreatedAt int64  `json:"created_at"`
-	UpdatedAt int64  `json:"updated_at"`
+	ID          string `json:"id"`
+	UserID      int64  `json:"user_id"`
+	NIK         string `json:"nik"`
+	FullName    string `json:"full_name"`
+	LegalName   string `json:"legal_name"`
+	BirthPlace  string `json:"birth_place"`
+	BirthDate   string `json:"birth_date"`
+	Salary      int64  `json:"salary"`
+	KtpPhoto    string `json:"ktp_photo"`
+	SelfiePhoto string `json:"selfie_photo"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
 }
 
 func (c *ContactEvent) GetId() string {

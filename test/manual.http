@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "name": "Joko",
-  "id": "joko",
+  "username": "joko",
   "password": "joko"
 }
 
@@ -13,7 +13,7 @@ POST http://localhost:3000/api/users/_login
 Content-Type: application/json
 
 {
-  "id": "joko",
+  "username": "joko",
   "password": "joko"
 }
 
@@ -44,10 +44,14 @@ Accept: application/json
 Authorization: {{token}}
 
 {
-  "first_name": "Joko",
-  "last_name": "Morro",
-  "phone": "08123456789",
-  "email": "joko@example.com"
+  "nik": "3200000000000001",
+  "full_name": "Joko Morro",
+  "legal_name": "Joko Morro",
+  "birth_place": "Jakarta",
+  "birth_date": "1990-01-01",
+  "salary": 7500000,
+  "ktp_photo": "https://example.com/ktp-joko.jpg",
+  "selfie_photo": "https://example.com/selfie-joko.jpg"
 }
 
 ### Get detail contact
@@ -57,7 +61,7 @@ Accept: application/json
 Authorization: {{token}}
 
 ### Search contacts
-GET http://localhost:3000/api/contacts?size=10&page=1&name=jo&phone=0812&email=joko
+GET http://localhost:3000/api/contacts?size=10&page=1&full_name=jo&legal_name=jo
 Content-Type: application/json
 Accept: application/json
 Authorization: {{token}}
@@ -69,10 +73,14 @@ Accept: application/json
 Authorization: {{token}}
 
 {
-  "first_name": "Budi",
-  "last_name": "Nugraha",
-  "phone": "088324324",
-  "email": "budi@example.com"
+  "nik": "3200000000000002",
+  "full_name": "Budi Nugraha",
+  "legal_name": "Budi Nugraha",
+  "birth_place": "Bandung",
+  "birth_date": "1992-02-02",
+  "salary": 8200000,
+  "ktp_photo": "https://example.com/ktp-budi.jpg",
+  "selfie_photo": "https://example.com/selfie-budi.jpg"
 }
 
 ### delete contact
